@@ -14,6 +14,7 @@ if ( !empty($_POST)) { // if not first time through
 	$emailError = null;
 	$mobileError = null;
 	$passwordError = null;
+	$fileDescriptionError = null;
 
 	// initialize $_POST variables
 	$name = $_POST['name'];
@@ -28,6 +29,8 @@ if ( !empty($_POST)) { // if not first time through
 	$fileSize = ''; 
 	$fileType = '';
 	$content = '';
+	$fileFullPath = '';
+	$fileDescription = '';
 
 	// validate user input
 	$valid = true;
@@ -71,18 +74,39 @@ if ( !empty($_POST)) { // if not first time through
 	$fileSize = $_FILES['userfile']['size'];
 	$fileType = $_FILES['userfile']['type'];
 	$content = file_get_contents($tmpName);
-	
+	$fileDescription = $_POST['filedescription'];
+		//$fileLocation = "/home/besmith2/public_html/cis355/Prog4/uploads/";
+			$fileLocation = "uploads/";
+			$fileFullPath = $fileLocation . $fileName; 
+			if (!file_exists($fileLocation))
+				mkdir ($fileLocation); // create subdirectory, if necessary 
+
+			// if file does not already exist, upload it
+			if (!file_exists($fileFullPath)) {
+				$result = move_uploaded_file($tmpName, $fileFullPath);
+			/*	if ($result) {
+					echo "File <b><i>" . $fileName 
+						. "</i></b> has been successfully uploaded.";
+
+				} else {
+					echo "Upload denied for file. " . $fileName 
+						. "</i></b>. Verify file size < 2MB. ";
+				} */
+			}
+			// otherwise, show error message
+			else {
+				echo "File <b><i>" . $fileName 
+					. "</i></b> already exists. Please rename file.";
+			}
 		$pdo = Database::connect();
 		
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		/* $sql = "INSERT INTO customers (name,email,mobile,password_hash) values(?, ?, ?, ?)";
-		$q = $pdo->prepare($sql);
-		$q->execute(array($name,$email,$mobile,$passwordhash)); */
+
 		
-		$sql = "INSERT INTO customers (name,email,mobile,password_hash,filename,filesize,filetype,filecontent)
-					values(?, ?, ?, ?, ?, ?, ?, ?)";
+		$sql = "INSERT INTO customers (name,email,mobile,password_hash,filename,filesize,filetype,filecontent,filepath,filedescription)
+					values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $q = $pdo->prepare($sql);
-            $q->execute(array($name, $email, $mobile, $passwordhash,$fileName,$fileSize,$fileType,$content));
+            $q->execute(array($name, $email, $mobile, $passwordhash,$fileName,$fileSize,$fileType,$content,$fileFullPath,$fileDescription));
 		
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		$sql = "SELECT * FROM customers WHERE email = ? AND password_hash = ? LIMIT 1";
@@ -166,6 +190,16 @@ if ( !empty($_POST)) { // if not first time through
 						<input name="userfile" type="file" id="userfile">
 					</div>
 					<br />
+				</div>
+				
+				<div class="control-group <?php echo !empty($fileDescriptionError)?'error':'';?>">
+					<label class="control-label">Description</label>
+					<div class="controls">
+						<input name="filedescription" type="text"  placeholder="File Description" value="<?php echo !empty($fileDescription)?$fileDescription:'';?>">
+						<?php if (!empty($fileDescriptionError)): ?>
+							<span class="help-inline"><?php echo $fileDescriptionError;?></span>
+						<?php endif;?>
+					</div>
 				</div>
 				
 				<br />
