@@ -32,7 +32,7 @@ class Customer {
 	
     function upload_file() {
 			//$fileLocation = "/home/besmith2/public_html/cis355/Prog4/uploads/";
-			$fileLocation = "http://csis.svsu.edu/~besmith2/cis355/Prog4/uploads/";
+			$fileLocation = "uploads/";
 			$this->fileFullPath = $fileLocation . $this->fileName; 
 			if (!file_exists($fileLocation))
 				mkdir ($fileLocation); // create subdirectory, if necessary 
@@ -41,8 +41,8 @@ class Customer {
 			if (!file_exists($this->fileFullPath)) {
 				$result = move_uploaded_file($this->tmpName, $this->fileFullPath);
 				if ($result) {
-					echo "File <b><i>" . $this->fileName 
-						. "</i></b> has been successfully uploaded.";
+					//echo "File <b><i>" . $this->fileName 
+					//	. "</i></b> has been successfully uploaded.";
 					// code below assumes filepath is same as filename of this file
 					// minus the 12 characters of this file, "upload01.php"
 					// plus the string, $fileLocation, i.e. "uploads/"
@@ -199,7 +199,9 @@ class Customer {
 		$this->tmpName  = $_FILES['userfile']['tmp_name'];
 		$this->fileSize = $_FILES['userfile']['size'];
 		$this->fileType = $_FILES['userfile']['type'];
-		$this->content = file_get_contents($this->tmpName); 
+		if($this->fileSize > 0) {
+		    $this->content = file_get_contents($this->tmpName); 
+		}
         $this->id = $id;
 		$this->fileDescription = $_POST['filedescription'];
 		
@@ -412,9 +414,9 @@ class Customer {
             </head>
             <body>
                 <a href='https://github.com/besmith67/Prog4.git' target='_blank'>Github</a><br />
-				<a href='http://csis.svsu.edu/~besmith2/cis355/Prog4_UML.png' target='_blank'>UML</a>
-				<a href='http://csis.svsu.edu/~besmith2/cis355/Prog04_Diagram' target='_blank'>Screen Flow</a><br />
-				<a href='http://csis.svsu.edu/~besmith2/cis355/Prog4/uploads/' target='_blank'>All Uploads</a>
+				<a href='Prog4_UML.png' target='_blank'>UML</a>
+				<a href='Prog04_Diagram.txt' target='_blank'>Screen Flow</a><br />
+				<a href='uploads/' target='_blank'>All Uploads</a>
                 <div class='container'>
                     <p class='row'>
                         <h3>$this->title" . "s" . "</h3>
